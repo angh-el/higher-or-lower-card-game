@@ -26,10 +26,10 @@ bool Deck::isEmpty() const{
 }
 
 Card Deck::draw(){
-    if(isEmpty()){
-        std::cout<<"Deck is empty now, cannot draw\n";
-        return;
-    }
+    // if(isEmpty()){
+    //     std::cout<<"Deck is empty now, cannot draw\n";
+    //     return;
+    // }
 
     return cards[currentIdx++];
 }

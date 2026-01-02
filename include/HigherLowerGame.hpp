@@ -21,6 +21,8 @@ private:
     bool peekedCard;
     Card nextCardPeeked;
 
+
+
     int rollDice();
     void applyDiceEffect(DiceEffect effect, Card& nextCard);
     bool evaluateGuess(Guess guess, Card& current, Card& next);

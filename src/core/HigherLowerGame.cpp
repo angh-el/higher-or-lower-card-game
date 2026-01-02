@@ -1,7 +1,18 @@
 #include "HigherLowerGame.hpp"
 #include <random>
 
-HigherLowerGame::HigherLowerGame() : deck(), hearts(3), basePoints(10), streakMultiplier(1.0), dieMultiplier(1.0), gameOver(false), peekedCard(false), currentCard(Rank::Ace, Suit::Spades), nextCardPeeked(Rank::Ace, Suit::Spades){
+HigherLowerGame::HigherLowerGame() : 
+    deck(), 
+    currentCard(Rank::Ace, Suit::Spades), 
+    hearts(3),
+    score(0), 
+    basePoints(10), 
+    streakMultiplier(1.0), 
+    dieMultiplier(1.0), 
+    gameOver(false), 
+    peekedCard(false), 
+    nextCardPeeked(Rank::Ace, Suit::Spades)
+    {
     currentCard = deck.draw();
 };
 
@@ -111,7 +122,7 @@ void HigherLowerGame::processGuess(Guess guess){
     updateScore(correct);
 
     currentCard = nextCard;
-    std::cout << "Hearts: " << hearts << " | Score: " <<score<< " | Multiplier: " << std::fixed << streakMultiplier<< "\n";
+    // std::cout << "Hearts: " << hearts << " | Score: " <<score<< " | Multiplier: " << std::fixed << streakMultiplier<< "\n";
     
     if(gameOver){
         std::cout<<"Game Over! Final Score: "<<score<<"\n";

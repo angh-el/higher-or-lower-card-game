@@ -13,11 +13,11 @@ build: $(TARGET)
 $(TARGET): $(OBJ)
 	$(CXX) $(CXXFLAGS) -o $(TARGET) $(OBJ)
 
-%.o: %.cpp:
-	$(CXX) $(CXXFLAGS) - c $< -o $@
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 run: build
 	./$(TARGET)
 
 clean:
-	rm -f $(OBJ) %(TARGET)
+	rm -f $(OBJ) $(TARGET)

@@ -18,6 +18,9 @@ public:
 
     void increaseRank();
     void decreaseRank();
+
+    Rank getRank() const;
+    Suit getSuit() const;    
 };
 
 #endif

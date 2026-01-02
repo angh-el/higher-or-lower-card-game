@@ -1,5 +1,5 @@
-#ifndef HIGHERORLOWERGAME_HPP
-#define HIGHERORLOWERGAME_HPP
+#ifndef HIGHERLOWERGAME_HPP
+#define HIGHERLOWERGAME_HPP
 
 #include "Card.hpp"
 #include "Deck.hpp"
@@ -13,6 +13,7 @@ private:
     Card currentCard;
     int hearts;
     int score;
+    int basePoints;
     double streakMultiplier;
     double dieMultiplier;
 
@@ -27,8 +28,17 @@ private:
 
 public:
     HigherLowerGame();
-    
 
+    void startNewRound();
+    void processGuess(Guess guess);
+
+    Card getCurrentCard() const;
+    int getHearts() const;
+    int getScore() const;
+    double getStreakMultiplier() const;
+    bool isGameOver() const;
+    size_t getCardsRemaining() const;
+    std::string getDiceEffect() const;
 };
 
 #endif

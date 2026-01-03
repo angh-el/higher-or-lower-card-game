@@ -12,38 +12,38 @@ Deck::Deck() : currentIdx(0){
         }
     }
 
+    // shuffle immediately so deck is ready to use
     shuffle();
 }
 
 void Deck::shuffle(){
+    // static random engine avoid generating new seed on every shuffle
+    // trying to avoid unecessary overhead
     static std::random_device rd;
     static std::mt19937 generator(rd());
     std::shuffle(cards.begin(), cards.end(), generator);
 }
 
 bool Deck::isEmpty() const{
+    // deck is considered empty when the cursor reaches the end
     return currentIdx >= cards.size();
 }
 
 Card Deck::draw(){
-    // if(isEmpty()){
-    //     std::cout<<"Deck is empty now, cannot draw\n";
-    //     return;
-    // }
-
+    // method is intentionally kept lightweight as it would be called often
+    // user's responsibility to check if a draw is possible    
     return cards[currentIdx++];
 }
 
 void Deck::reset(){
+    // cards are stored in memory so resetting the cursor is enough to reuse the deck
     currentIdx = 0;
+    
+    // reshuflle it so that it's not the same game again 
     shuffle();
 }
 
 Card Deck::peek() const{
-    if (isEmpty()){
-        std::cout<<"Deck is empty now, cannot peek\n";
-    }
-
     return cards[currentIdx];
 }
 

@@ -4,7 +4,9 @@
 
 Renderer::Renderer(SDL_Renderer* ren) : renderer(ren), font(nullptr){}
 
-Renderer::~Renderer(){
+Renderer::~Renderer(){  
+    // make sure all sdl resources owned by the class
+    // are released when rederer is destroyed
     cleanup();
 }
 
@@ -14,22 +16,14 @@ bool Renderer::initialise(){
         return false;
     }
     
-    // Load default font
-    // font = TTF_OpenFont("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 24);
-    // if (!font) {
-    //     font = TTF_OpenFont("/System/Library/Fonts/Helvetica.ttc", 24);
-    //     if (!font) {
-    //         std::cerr << "Failed to load font: " << TTF_GetError() << std::endl;
-    //         return false;
-    //     }
-    // }
-
+    // load a local font asset to avoid platform dependent paths
     font = TTF_OpenFont("assets/DejaVuSans.ttf", 24);
     
     return true;
 }
 
 SDL_Texture* Renderer::loadTexture(const std::string& path) {
+    // returns caches texture if already loaded
     if (textures.find(path) != textures.end()) {
         return textures[path];
     }
@@ -43,7 +37,8 @@ SDL_Texture* Renderer::loadTexture(const std::string& path) {
     SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
     SDL_FreeSurface(surface);
     
-    if (texture) {
+    // cache for future reuse
+    if (texture){
         textures[path] = texture;
     }
     
@@ -84,6 +79,9 @@ std::string Renderer::getDiceImagePath(int diceValue) const {
 }
 
 void Renderer::renderText(const std::string& text, int x, int y, SDL_Color color, bool centered) {
+    // text is rendered dynamically rather than cached because 
+    // score and messages change frequently
+    
     SDL_Surface* surface = TTF_RenderText_Solid(font, text.c_str(), color);
     if (!surface) {
         return;
@@ -169,11 +167,11 @@ void Renderer::renderDice(int diceValue, const std::string& effectText) {
             SDL_RenderCopy(renderer, diceTexture, nullptr, &diceRect);
         }
         
-        // Render effect text below dice
+        // render the dice effect text below dice
         if (!effectText.empty()) {
             SDL_Color yellow = {255, 255, 0, 255};
             
-            // Split text into multiple lines if needed
+            // split text into multiple lines if needed
             int yOffset = 320;
             size_t pos = 0;
             std::string remaining = effectText;
@@ -202,6 +200,7 @@ void Renderer::renderDice(int diceValue, const std::string& effectText) {
 }
 
 void Renderer::cleanup() {
+    //explicitly destroy cached textures
     for (auto& pair : textures) {
         SDL_DestroyTexture(pair.second);
     }

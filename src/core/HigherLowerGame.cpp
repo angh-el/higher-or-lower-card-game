@@ -14,6 +14,8 @@ HigherLowerGame::HigherLowerGame() :
         nextCardPeeked(Rank::Ace, Suit::Spades), 
         lastRoundResult(false, false, false, 0, "", currentCard)
       {
+
+    // draw initial card so the player always starts with a visible card
     currentCard = deck.draw();
     lastRoundResult = {false, false, false, 0, "", currentCard};
 };
@@ -27,6 +29,7 @@ int HigherLowerGame::rollDice(){
 }
 
 std::string HigherLowerGame::getDiceEffectText(DiceEffect effect) const {
+    // maps dice effects to descriptions to be used by ui
     switch(effect) {
         case DiceEffect::RankPlusOne:
             return "Next card rank +1!";
@@ -48,6 +51,9 @@ std::string HigherLowerGame::getDiceEffectText(DiceEffect effect) const {
 void HigherLowerGame::applyDiceEffect(DiceEffect effect, Card& nextCard, std::string& effectText){
     effectText = getDiceEffectText(effect);
     
+    // dice effects mutate only what they directly affect
+    // to avaid unintended side effects
+
     switch(effect) {
         case DiceEffect::RankPlusOne:
             std::cout << "Dice Effect: Next card rank +1\n";
@@ -83,6 +89,8 @@ void HigherLowerGame::applyDiceEffect(DiceEffect effect, Card& nextCard, std::st
 }
 
 bool HigherLowerGame::evaluateGuess(Guess guess, Card& current,  Card& next){
+    // numeric rank comaprison using enum values directly
+    // no need for additional rank mapping logic
     int currentRank = static_cast<int>(current.getRank());
     int nextRank = static_cast<int>(next.getRank());
     if(guess == Guess::Higher){
@@ -94,12 +102,16 @@ bool HigherLowerGame::evaluateGuess(Guess guess, Card& current,  Card& next){
 }
 
 void HigherLowerGame::updateScore(bool correct){
+    // combine streak and dice multipliers to reward player for their risk
+    // keeps scoring predictable
     if (correct){
         double totalMultiplier = streakMultiplier * dieMultiplier;
         score += static_cast<int>(basePoints * totalMultiplier);
+        // increase streak to reward player for correct guesses
         streakMultiplier = std::min(2.0, streakMultiplier + 0.1);
     }
     else{
+        // reset streak on wrong guess to enforce tension
         streakMultiplier = 1.0;
         hearts--;
         if (hearts <= 0){
@@ -107,6 +119,7 @@ void HigherLowerGame::updateScore(bool correct){
         }
     }
 
+    // this makes sure that dice effects only aplly to the current round
     dieMultiplier = 1.0;
 }
 
@@ -144,7 +157,7 @@ void HigherLowerGame::processGuess(Guess guess){
         lastRoundResult.wasColourMatch = true;
         int diceRoll = rollDice();
         lastRoundResult.diceRoll = diceRoll;
-        std::cout<<"Colour match, rolling dice ...\n";
+        // std::cout<<"Colour match, rolling dice ...\n";
         std::string effectText;
         DiceEffect effect = static_cast<DiceEffect>(diceRoll);
         applyDiceEffect(effect, nextCard, effectText);
@@ -176,6 +189,7 @@ void HigherLowerGame::processGuess(Guess guess){
     }
 }
 
+// getters
 Card HigherLowerGame::getCurrentCard() const {return currentCard;}
 int HigherLowerGame::getHearts() const {return hearts;}
 int HigherLowerGame::getScore() const {return score;}

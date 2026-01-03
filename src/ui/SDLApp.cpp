@@ -9,17 +9,20 @@ SDLApp::~SDLApp() {
 }
 
 bool SDLApp::initialise() {
+    // init sdl video subsystem
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         std::cerr << "SDL initialisation failed: " << SDL_GetError() << std::endl;
         return false;
     }
     
+    // init image loading for png 
     int imgFlags = IMG_INIT_PNG;
     if (!(IMG_Init(imgFlags) & imgFlags)) {
         std::cerr << "SDL_image initialisation failed: " << IMG_GetError() << std::endl;
         return false;
     }
     
+    // 800x600 windoww
     window = SDL_CreateWindow(
         "Higher or Lower Card Game",
         SDL_WINDOWPOS_CENTERED,
@@ -33,17 +36,20 @@ bool SDLApp::initialise() {
         return false;
     }
     
+    // createt the acelerated rendere
     sdlRenderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     if (!sdlRenderer) {
         std::cerr << "Renderer creation failed: " << SDL_GetError() << std::endl;
         return false;
     }
     
+    // construct rendering sub system
     renderer = std::make_unique<Renderer>(sdlRenderer);
     if (!renderer->initialise()) {
         return false;
     }
     
+    // construct core game logic
     game = std::make_unique<HigherLowerGame>();
     
     running = true;
@@ -52,11 +58,14 @@ bool SDLApp::initialise() {
 
 void SDLApp::handleEvents() {
     SDL_Event event;
+
+    // poll and process events
     while (SDL_PollEvent(&event)) {
         if (event.type == SDL_QUIT) {
             running = false;
         }
         else if (event.type == SDL_KEYDOWN && !game->isGameOver()) {
+            // translate key presses into game actions
             switch (event.key.keysym.sym) {
                 case SDLK_h:
                     processGameGuess(Guess::Higher);
@@ -71,15 +80,19 @@ void SDLApp::handleEvents() {
             }
         }
         else if (event.type == SDL_KEYDOWN && game->isGameOver()) {
-            // Press any key to exit when game is over
+            // press any key to exit when game is over
             running = false;
         }
     }
 }
 
 void SDLApp::processGameGuess(Guess guess) {
+    // forward the guess to the game logic
     game->processGuess(guess);
     
+    // cache round result for rendering
+    // avoiding tight coupling between renderer
+    // and internal game state
     RoundResult result = game->getLastRoundResult();
     
     if (result.wasColourMatch || !result.diceEffectText.empty()) {
@@ -91,10 +104,6 @@ void SDLApp::processGameGuess(Guess guess) {
         lastDiceRoll = 0;
         lastDiceEffect = "";
     }
-}
-
-void SDLApp::update() {
-    // Game logic is handled in processGameGuess
 }
 
 void SDLApp::render() {
@@ -124,10 +133,11 @@ void SDLApp::render() {
 void SDLApp::run() {
     std::cout << "Controls: Press 'H' for Higher, 'L' for Lower, 'ESC' or 'Q' to quit\n";
     
+    // main application loop
     while (running) {
         handleEvents();
-        update();
         render();
+        // about 60 fps
         SDL_Delay(16); 
     }
     
@@ -135,6 +145,8 @@ void SDLApp::run() {
 }
 
 void SDLApp::cleanup() {
+    // cleanup the rendering subsystem first 
+    // since it depends on the sdl renderer
     if (renderer) {
         renderer->cleanup();
     }

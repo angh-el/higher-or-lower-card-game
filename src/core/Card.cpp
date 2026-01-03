@@ -1,5 +1,6 @@
 #include "Card.hpp"
 
+// keep the Card a light weight value object
 Card::Card(Rank r, Suit s) : rank(r), suit(s){};
 
 std::string Card::toString() const{
@@ -36,6 +37,7 @@ std::string Card::toString() const{
     return cardName;
 }
 
+// centralises colour determinations so does not depend on hard coded suit checks
 bool Card::isRed() const{
     return suit == Suit::Hearts || suit == Suit::Diamonds;
 }
@@ -47,15 +49,11 @@ void Card::increaseRank(){
 }
 
 void Card::decreaseRank(){
-    if (rank != Rank::Ace){
+    if (rank != Rank::Two){
         rank = static_cast<Rank>(static_cast<int>(rank) - 1);
     }
 }
 
-Rank Card::getRank() const{
-    return rank;
-}
+Rank Card::getRank() const{return rank;}
 
-Suit Card::getSuit() const{
-    return suit;
-}
+Suit Card::getSuit() const{ return suit;}

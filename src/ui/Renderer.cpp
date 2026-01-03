@@ -15,14 +15,16 @@ bool Renderer::initialise(){
     }
     
     // Load default font
-    font = TTF_OpenFont("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 24);
-    if (!font) {
-        font = TTF_OpenFont("/System/Library/Fonts/Helvetica.ttc", 24);
-        if (!font) {
-            std::cerr << "Failed to load font: " << TTF_GetError() << std::endl;
-            return false;
-        }
-    }
+    // font = TTF_OpenFont("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 24);
+    // if (!font) {
+    //     font = TTF_OpenFont("/System/Library/Fonts/Helvetica.ttc", 24);
+    //     if (!font) {
+    //         std::cerr << "Failed to load font: " << TTF_GetError() << std::endl;
+    //         return false;
+    //     }
+    // }
+
+    font = TTF_OpenFont("assets/DejaVuSans.ttf", 24);
     
     return true;
 }
@@ -120,7 +122,7 @@ void Renderer::renderTopBar(double multiplier, int score, int hearts) {
     SDL_Color white = {255, 255, 255, 255};
     
     // Left: Multiplier
-    std::string multText = "x" + std::to_string(multiplier).substr(0, 3);
+    std::string multText = "Multiplier x" + std::to_string(multiplier).substr(0, 3);
     renderText(multText, 100, 40, white, true);
     
     // Center: Score

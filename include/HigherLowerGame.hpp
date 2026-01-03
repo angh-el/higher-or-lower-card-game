@@ -49,7 +49,7 @@ private:
     void applyDiceEffect(DiceEffect effect, Card& nextCard, std::string& effectText);
     bool evaluateGuess(Guess guess, Card& current, Card& next);
     void updateScore(bool correct);
-    std::string HigherLowerGame::getDiceEffectText(DiceEffect effect) const;
+    std::string getDiceEffectText(DiceEffect effect) const;
 
 public:
     HigherLowerGame();

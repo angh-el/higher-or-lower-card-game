@@ -22,6 +22,7 @@ int HigherLowerGame::rollDice(){
     static std::random_device rd;
     static std::mt19937 generator(rd());
     static std::uniform_int_distribution<> dis(1, 6);
+    // static std::uniform_int_distribution<> dis(4, 4);
     return dis(generator);
 }
 
@@ -61,12 +62,12 @@ void HigherLowerGame::applyDiceEffect(DiceEffect effect, Card& nextCard, std::st
             dieMultiplier = 2.0;
             break;
         case DiceEffect::PeekNextCard:
-            std::cout <<"Dice Effect: Peek at next card\n";
+            std::cout <<"Dice Effect: Peek at next card \n ";
             if (!deck.isEmpty()) {
                 nextCardPeeked = deck.peek();
                 peekedCard = true;
                 std::cout << "Next card is: "<<nextCardPeeked.toString()<<"\n";
-                effectText + nextCardPeeked.toString();
+                effectText += nextCardPeeked.toString();
             }
             break;
         case DiceEffect::GainHeart:
@@ -77,16 +78,18 @@ void HigherLowerGame::applyDiceEffect(DiceEffect effect, Card& nextCard, std::st
             std::cout << "Dice Effect: No effect\n";
             break;
     }
+
+    // effectText += "Yooo";
 }
 
 bool HigherLowerGame::evaluateGuess(Guess guess, Card& current,  Card& next){
     int currentRank = static_cast<int>(current.getRank());
     int nextRank = static_cast<int>(next.getRank());
     if(guess == Guess::Higher){
-        return nextRank > currentRank;
+        return nextRank >= currentRank;
     }
     else{
-        return nextRank < currentRank;
+        return nextRank <= currentRank;
     }
 }
 

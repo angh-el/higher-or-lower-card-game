@@ -16,19 +16,21 @@ std::string Card::toString() const{
         case Rank::Eight:   cardName += "8";  break;
         case Rank::Nine:    cardName += "9";  break;
         case Rank::Ten:     cardName += "10"; break;
-        case Rank::Jack:    cardName += "J";  break;
-        case Rank::Queen:   cardName += "Q";  break;
-        case Rank::King:    cardName += "K";  break;
-        case Rank::Ace:     cardName += "A";  break;
+        case Rank::Jack:    cardName += "Jack";  break;
+        case Rank::Queen:   cardName += "Queen";  break;
+        case Rank::King:    cardName += "King";  break;
+        case Rank::Ace:     cardName += "Ace";  break;
         default:            cardName += "???";break;
     }
 
+    cardName += " of ";
+
     // add the suit
     switch (suit){
-        case Suit::Hearts:      cardName += "H"; break;
-        case Suit::Diamonds:    cardName += "D"; break;
-        case Suit::Spades:      cardName += "S"; break;
-        case Suit::Clubs:       cardName += "C"; break;
+        case Suit::Hearts:      cardName += "Hearts"; break;
+        case Suit::Diamonds:    cardName += "Diamonds"; break;
+        case Suit::Spades:      cardName += "Spades"; break;
+        case Suit::Clubs:       cardName += "Clubs"; break;
     }
 
     return cardName;

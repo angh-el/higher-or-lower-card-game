@@ -2,18 +2,20 @@
 #include <random>
 
 HigherLowerGame::HigherLowerGame() : 
-    deck(), 
-    currentCard(Rank::Ace, Suit::Spades), 
-    hearts(3),
-    score(0), 
-    basePoints(10), 
-    streakMultiplier(1.0), 
-    dieMultiplier(1.0), 
-    gameOver(false), 
-    peekedCard(false), 
-    nextCardPeeked(Rank::Ace, Suit::Spades)
-    {
+        deck(), 
+        currentCard(Rank::Ace, Suit::Spades), 
+        hearts(3),
+        score(0), 
+        basePoints(10), 
+        streakMultiplier(1.0), 
+        dieMultiplier(1.0), 
+        gameOver(false), 
+        peekedCard(false), 
+        nextCardPeeked(Rank::Ace, Suit::Spades), 
+        lastRoundResult(false, false, false, 0, "", currentCard)
+      {
     currentCard = deck.draw();
+    lastRoundResult = {false, false, false, 0, "", currentCard};
 };
 
 int HigherLowerGame::rollDice(){
@@ -23,7 +25,28 @@ int HigherLowerGame::rollDice(){
     return dis(generator);
 }
 
-void HigherLowerGame::applyDiceEffect(DiceEffect effect, Card& nextCard){
+std::string HigherLowerGame::getDiceEffectText(DiceEffect effect) const {
+    switch(effect) {
+        case DiceEffect::RankPlusOne:
+            return "Next card rank +1!";
+        case DiceEffect::RankMinusOne:
+            return "Next card rank -1!";
+        case DiceEffect::MultiplierTimesTwo:
+            return "Score multiplier x2!";
+        case DiceEffect::PeekNextCard:
+            return "Peek at next card!";
+        case DiceEffect::GainHeart:
+            return "+1 Heart!";
+        case DiceEffect::NoEffect:
+            return "No effect";
+        default:
+            return "";
+    }
+}
+
+void HigherLowerGame::applyDiceEffect(DiceEffect effect, Card& nextCard, std::string& effectText){
+    effectText = getDiceEffectText(effect);
+    
     switch(effect) {
         case DiceEffect::RankPlusOne:
             std::cout << "Dice Effect: Next card rank +1\n";
@@ -43,6 +66,7 @@ void HigherLowerGame::applyDiceEffect(DiceEffect effect, Card& nextCard){
                 nextCardPeeked = deck.peek();
                 peekedCard = true;
                 std::cout << "Next card is: "<<nextCardPeeked.toString()<<"\n";
+                effectText + nextCardPeeked.toString();
             }
             break;
         case DiceEffect::GainHeart:
@@ -86,10 +110,13 @@ void HigherLowerGame::updateScore(bool correct){
 void HigherLowerGame::processGuess(Guess guess){
     if (gameOver) return;
 
+    lastRoundResult = {false, false, false, 0, "", currentCard};
+
     if (deck.isEmpty()){
         std::cout<<"Deck is finished, reshuffling\n";
         deck.reset();
         hearts += 3;
+        lastRoundResult.diceEffectText = "Deck reshuffled! +3 Hearts";
     }
 
     // draws the next card
@@ -99,20 +126,37 @@ void HigherLowerGame::processGuess(Guess guess){
     if (nextCard.getRank() == currentCard.getRank()){
         std::cout<<"Same rank, +1 heart\n";
         hearts++;
+        lastRoundResult.wasTie = true;
+        if (!lastRoundResult.diceEffectText.empty()){
+            lastRoundResult.diceEffectText += "\nTIE! +1 Heart";
+        } 
+        else{
+            lastRoundResult.diceEffectText = "TIE! Same rank! +1 Heart";
+        }
     }
 
     // check if colours match
     bool colourMatch = currentCard.isRed() == nextCard.isRed();
     if(colourMatch){
+        lastRoundResult.wasColourMatch = true;
         int diceRoll = rollDice();
+        lastRoundResult.diceRoll = diceRoll;
         std::cout<<"Colour match, rolling dice ...\n";
+        std::string effectText;
         DiceEffect effect = static_cast<DiceEffect>(diceRoll);
-        applyDiceEffect(effect, nextCard);
+        applyDiceEffect(effect, nextCard, effectText);
+        if (!lastRoundResult.diceEffectText.empty()) {
+            lastRoundResult.diceEffectText += "\n" + effectText;
+        } else {
+            lastRoundResult.diceEffectText = effectText;
+        }
     }
 
     peekedCard = false;
 
     bool correct = evaluateGuess(guess, currentCard, nextCard);
+    lastRoundResult.wasCorrect = correct;
+    lastRoundResult.nextCard = nextCard;
     
     std::cout<<"Next card: "<<nextCard.toString()<<"\n";
 
@@ -135,3 +179,4 @@ int HigherLowerGame::getScore() const {return score;}
 double HigherLowerGame::getStreakMultiplier() const {return streakMultiplier;}
 bool HigherLowerGame::isGameOver() const {return gameOver;}
 size_t HigherLowerGame::getCardsRemaining() const {return deck.cardsRemaining();}
+RoundResult HigherLowerGame::getLastRoundResult() const {return lastRoundResult;}
